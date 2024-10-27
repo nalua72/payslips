@@ -13,8 +13,10 @@ def main():
         # For every payslip file, extracts the main table, adds a column with the date and stores it in a list
         if "pdf" in file:
             if file.split("_")[0] != "20220430":
-                dfs1 = read_pdf(file, stream=True, pages=1, relative_area=True, relative_columns=True, area=[
-                                38, 0, 63, 100], columns=[15, 25, 31, 69, 80])
+                area = [38, 0, 63, 100]
+                columns = [15, 25, 31, 69, 80]
+                dfs1 = read_pdf(file, stream=True, pages=1, relative_area=True,
+                                relative_columns=True, area=area, columns=columns)
                 df1 = pd.DataFrame(dfs1[0])
                 df1.insert(0, "FECHA", [file.split("_")[0]
                                         for _ in range(len(df1))])
@@ -23,15 +25,17 @@ def main():
                 # For march months (except for 2016 and 2017) there are 2 pages in the excel because of the BONUS. Table is extracted from the second page,
                 # added Fecha columnd and stored it in the list
                 if re.search("[0-9][0-9][0-9][0-9]03[0-9][0-9]", file) and file.split("_")[0] != "20160331" and file.split("_")[0] != "20170331":
-                    dfs1 = read_pdf(file, stream=True, pages=2, relative_area=True, relative_columns=True, area=[
-                                    38, 0, 63, 100], columns=[15, 25, 31, 69, 80])
+                    dfs1 = read_pdf(file, stream=True, pages=2, relative_area=True,
+                                    relative_columns=True, area=area, columns=columns)
                     df1 = pd.DataFrame(dfs1[0])
                     df1.insert(0, "FECHA", [file.split("_")[0]
                                             for _ in range(len(df1))])
                     data.append(df1)
             else:
-                dfs1 = read_pdf(file, stream=True, pages=1, relative_area=True, relative_columns=True, area=[
-                    36, 0, 63, 100], columns=[15, 25, 30, 67, 78])
+                area = [36, 0, 63, 100]
+                columns = [15, 25, 30, 67, 78]
+                dfs1 = read_pdf(file, stream=True, pages=1, relative_area=True,
+                                relative_columns=True, area=area, columns=columns)
                 df1 = pd.DataFrame(dfs1[0])
                 df1.insert(0, "FECHA", [file.split("_")[0]
                                         for _ in range(len(df1))])
