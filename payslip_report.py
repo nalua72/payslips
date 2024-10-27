@@ -24,7 +24,7 @@ def main():
                 # added Fecha columnd and stored it in the list
                 if re.search("[0-9][0-9][0-9][0-9]03[0-9][0-9]", file) and file.split("_")[0] != "20160331" and file.split("_")[0] != "20170331":
                     dfs1 = read_pdf(file, stream=True, pages=2, relative_area=True, relative_columns=True, area=[
-                        38, 0, 63, 100], columns=[15, 25, 31, 69, 80])
+                                    38, 0, 63, 100], columns=[15, 25, 31, 69, 80])
                     df1 = pd.DataFrame(dfs1[0])
                     df1.insert(0, "FECHA", [file.split("_")[0]
                                             for _ in range(len(df1))])
