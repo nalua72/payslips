@@ -1,42 +1,66 @@
 import os
 import re
 import pandas as pd
+from pathlib import Path
 from tabula import read_pdf
+
+# Function to extract a table from a file a return a dataframe. A DATA column is added.
 
 
 def pdftable_to_dataframe(file, area, columns, page):
     dfs = read_pdf(file, stream=True, pages=page, relative_area=True,
                    relative_columns=True, area=area, columns=columns)
     df = pd.DataFrame(dfs[0])
-    df.insert(0, "FECHA", [file.split("_")[0] for _ in range(len(df))])
+    df.insert(0, "FECHA", [file.name.split("_")[0] for _ in range(len(df))])
     return df
 
 
 def main():
     data = []
     # thisdir = r"Z:\Jose\Nominas\Cognizant"
-    thisdir = os.getcwd()
+    # thisdir = os.getcwd()
 
-    for file in os.listdir(thisdir):
-        # For every payslip file, extracts the main table, adds a column with the date and stores it in a list
-        if "pdf" in file:
-            if file.split("_")[0] != "20220430":
-                area = [38, 0, 63, 100]
-                columns = [15, 25, 31, 69, 80]
+    base_path = Path(r"Z:\Jose\Nominas\Cognizant")
+    files = list(base_path.glob("*.pdf"))
 
-                data.append(pdftable_to_dataframe(file, area, columns, 1))
+    for file in files:
 
-                # For march months (except for 2016 and 2017) there are 2 pages in the excel because of the BONUS. Table is extracted from the second page,
-                # added Fecha columnd and stored it in the list
-                if re.search("[0-9][0-9][0-9][0-9]03[0-9][0-9]", file) and file.split("_")[0] != "20160331" and file.split("_")[0] != "20170331":
+        if file.name.split("_")[0] != "20220430":
+            area = [38, 0, 63, 100]
+            columns = [15, 25, 31, 69, 80]
 
-                    data.append(pdftable_to_dataframe(file, area, columns, 2))
-            else:
-                area = [36, 0, 63, 100]
-                columns = [15, 25, 30, 67, 78]
+            data.append(pdftable_to_dataframe(file, area, columns, 1))
 
-                data.append(data.append(
-                    pdftable_to_dataframe(file, area, columns, 1)))
+            # For march months (except for 2016 and 2017) there are 2 pages in the excel because of the BONUS. Table is extracted from the second page.
+            if re.search("[0-9][0-9][0-9][0-9]03[0-9][0-9]", file.name) and file.name.split("_")[0] != "20160331" and file.name.split("_")[0] != "20170331":
+
+                data.append(pdftable_to_dataframe(file, area, columns, 2))
+        else:
+            area = [36, 0, 63, 100]
+            columns = [15, 25, 30, 67, 78]
+
+            data.append(data.append(
+                pdftable_to_dataframe(file, area, columns, 1)))
+
+    # for file in os.listdir(thisdir):
+    #     # For every payslip file, a dataframe with the table is stored in a list
+    #     if "pdf" in file:
+    #         if file.split("_")[0] != "20220430":
+    #             area = [38, 0, 63, 100]
+    #             columns = [15, 25, 31, 69, 80]
+
+    #             data.append(pdftable_to_dataframe(file, area, columns, 1))
+
+    #             # For march months (except for 2016 and 2017) there are 2 pages in the excel because of the BONUS. Table is extracted from the second page.
+    #             if re.search("[0-9][0-9][0-9][0-9]03[0-9][0-9]", file) and file.split("_")[0] != "20160331" and file.split("_")[0] != "20170331":
+
+    #                 data.append(pdftable_to_dataframe(file, area, columns, 2))
+    #         else:
+    #             area = [36, 0, 63, 100]
+    #             columns = [15, 25, 30, 67, 78]
+
+    #             data.append(data.append(
+    #                 pdftable_to_dataframe(file, area, columns, 1)))
 
     # A DataFrame is created with all the dataframes stored in the list
     df = pd.concat(data)
