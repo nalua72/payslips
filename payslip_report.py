@@ -49,34 +49,36 @@ def dataframe_clean(df):
 def main():
     data = []
 
-    base_path = Path(r"Z:\Jose\Nominas\Cognizant")
-    files = list(base_path.glob("*.pdf"))
+    payslips_path = Path(r"Z:\Jose\Nominas\Cognizant")
+    dest_file = Path(r"Z:\Jose\Nominas\Cognizant\payslip_report.xlsx")
 
-    for file in files:
-        if file.name.split("_")[0] != "20220430":
+    payslips = list(payslips_path.glob("*.pdf"))
+
+    for payslip in payslips:
+        if payslip.name.split("_")[0] != "20220430":
             area = [38, 0, 63, 100]
             columns = [15, 25, 31, 69, 80]
 
-            data.append(pdftable_to_dataframe(file, area, columns, 1))
+            data.append(pdftable_to_dataframe(payslip, area, columns, 1))
 
             # For march months (except for 2016 and 2017) there are 2 pages in the excel because of the BONUS. Table is extracted from the second page.
-            if re.search("\d{4}03\d{2}", file.name) and file.name.split("_")[0] != "20160331" and file.name.split("_")[0] != "20170331":
-                data.append(pdftable_to_dataframe(file, area, columns, 2))
+            if re.search("\d{4}03\d{2}", payslip.name) and payslip.name.split("_")[0] != "20160331" and payslip.name.split("_")[0] != "20170331":
+                data.append(pdftable_to_dataframe(payslip, area, columns, 2))
         else:
             area = [36, 0, 63, 100]
             columns = [15, 25, 30, 67, 78]
 
             data.append(data.append(
-                pdftable_to_dataframe(file, area, columns, 1)))
+                pdftable_to_dataframe(payslip, area, columns, 1)))
 
     # A DataFrame is created with all the dataframes stored in the list
     df = pd.concat(data)
 
     # Dataframe cleaning
-    df_clean = dataframe_clean(df)
+    df = dataframe_clean(df)
 
     # DataFrame is stored in excel file
-    df_clean.to_excel('payslip.xlsx', index=False)
+    df.to_excel(dest_file, index=False)
 
 
 if __name__ == "__main__":
