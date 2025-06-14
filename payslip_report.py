@@ -78,7 +78,7 @@ def main():
     df = dataframe_clean(df)
 
     # DataFrame is stored in excel file
-    df.to_excel(dest_file, index=False)
+    df.to_excel(dest_file, sheet_name='Master', index=False)
 
 
 if __name__ == "__main__":
