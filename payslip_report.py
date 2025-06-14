@@ -16,31 +16,29 @@ def pdftable_to_dataframe(file, area, columns, page):
 # Function that takes a df with payslips and formats it
 
 
-def dataframe_clean(df):
+def dataframe_format(df):
     # Name the columns
     df.columns = ["FECHA", "CUANTIA", "PRECIO",
                   "CODIGO", "CONCEPTO", "DEVENGOS", "DEDUCCIONES"]
     df = df.reset_index(drop=True)
     df = df.fillna(0)
 
-    # Change thousands separator from , to .
-    df['CUANTIA'] = df['CUANTIA'].str.replace(',', '.')
-    df['PRECIO'] = df['PRECIO'].str.replace(',', '.')
+    # Cambia el formato de strin a float en las columnas ("CUANTIA", "PRECIO", "DEVENGOS", "DEDUCCIONES"). Previamente se cambia el caracter ',' por '.'
     df['DEVENGOS'] = df['DEVENGOS'].str.replace('.', '')
-    df['DEVENGOS'] = df['DEVENGOS'].str.replace(',', '.')
-    df['DEDUCCIONES'] = df['DEDUCCIONES'].str.replace(',', '.')
+    column_to_modify = ["CUANTIA", "PRECIO", "DEVENGOS", "DEDUCCIONES"]
+    for col in column_to_modify:
+        df[col] = df[col].str.replace(',', '.', regex=False).astype(float)
 
-    # Modifies the columns to get the right format
-    column_modify = ["CUANTIA", "PRECIO", "DEVENGOS", "DEDUCCIONES"]
-    df[column_modify] = df[column_modify].astype(float)
+    # Formatea el campo'FECHA' a la forma deseada
     df['FECHA'] = pd.to_datetime(df['FECHA'], format='%Y%m%d').dt.date
-    df['CODIGO'] = df['CODIGO'].astype(int)
+
+    # Formatea el campo'CODIGO' a int
     df = df.fillna(0)
 
     # Adds column Balance
     df['BALANCE'] = df['DEVENGOS'] - df['DEDUCCIONES']
-    # Drop empty rows
 
+    # Drop empty rows
     filt = df['CONCEPTO'] == 0
     df = df.drop(index=df[filt].index)
     return df
@@ -75,7 +73,7 @@ def main():
     df = pd.concat(data)
 
     # Dataframe cleaning
-    df = dataframe_clean(df)
+    df = dataframe_format(df)
 
     # DataFrame is stored in excel file
     df.to_excel(dest_file, sheet_name='Master', index=False)
