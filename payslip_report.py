@@ -23,7 +23,9 @@ def dataframe_format(df):
     df = df.reset_index(drop=True)
     df = df.fillna(0)
 
-    # Cambia el formato de strin a float en las columnas ("CUANTIA", "PRECIO", "DEVENGOS", "DEDUCCIONES"). Previamente se cambia el caracter ',' por '.'
+    # Cambia el formato de string a float en las columnas
+    # ("CUANTIA", "PRECIO", "DEVENGOS", "DEDUCCIONES").
+    # # Previamente se cambia el caracter ',' por '.'
     df['DEVENGOS'] = df['DEVENGOS'].str.replace('.', '')
     column_to_modify = ["CUANTIA", "PRECIO", "DEVENGOS", "DEDUCCIONES"]
     for col in column_to_modify:
@@ -59,7 +61,8 @@ def main():
 
             data.append(pdftable_to_dataframe(payslip, area, columns, 1))
 
-            # For march months (except for 2016 and 2017) there are 2 pages in the excel because of the BONUS. Table is extracted from the second page.
+            # For march months (except for 2016 and 2017) there are 2 pages in the excel
+            # because of the BONUS. Table is extracted from the second page.
             if re.search("\d{4}03\d{2}", payslip.name) and payslip.name.split("_")[0] != "20160331" and payslip.name.split("_")[0] != "20170331":
                 data.append(pdftable_to_dataframe(payslip, area, columns, 2))
         else:
