@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 import pandas as pd
 from pathlib import Path
 from tabula import read_pdf
@@ -47,10 +49,13 @@ def dataframe_format(df):
 
 
 def main():
+
+    load_dotenv()
+
     data = []
 
-    payslips_path = Path(r"Z:\Jose\Nominas\Cognizant")
-    dest_file = Path(r"Z:\Jose\Nominas\Cognizant\payslip_report.xlsx")
+    payslips_path = Path(os.getenv("SOURCE_PATH"))
+    dest_file = Path(os.getenv("DEST_PATH"))
 
     payslips = list(payslips_path.glob("*.pdf"))
 
@@ -63,7 +68,7 @@ def main():
 
             # For march months (except for 2016 and 2017) there are 2 pages in the excel
             # because of the BONUS. Table is extracted from the second page.
-            if re.search("\d{4}03\d{2}", payslip.name) and payslip.name.split("_")[0] != "20160331" and payslip.name.split("_")[0] != "20170331":
+            if re.search(r"\d{4}03\d{2}", payslip.name) and payslip.name.split("_")[0] != "20160331" and payslip.name.split("_")[0] != "20170331":
                 data.append(pdftable_to_dataframe(payslip, area, columns, 2))
         else:
             area = [36, 0, 63, 100]
